@@ -14,27 +14,42 @@ namespace AsyncBoekOpdracht
             this.Auteur = auteur;
         }
         
-        public async Task<float> AIScore(){
-            // Deze 'berekening' is eigenlijk een ingewikkeld AI algoritme.
-            // Pas de volgende vier regels niet aan.
-            double ret = 1.0f;
-            for (int i = 0; i < 10000000; i++)
-                for (int j = 0; j < 10; j++)
-                    ret = (ret + Willekeurig.Random.NextDouble()) % 1.0;
-            await Task.Delay(0);
-            return (float)ret;
-        }
+        // public async Task<float> AIScore(){
+        //     // Deze 'berekening' is eigenlijk een ingewikkeld AI algoritme.
+        //     // Pas de volgende vier regels niet aan.
+        //     double ret = 1.0f;
+        //     for (int i = 0; i < 10000000; i++)
+        //         for (int j = 0; j < 10; j++)
+        //             ret = (ret + Willekeurig.Random.NextDouble()) % 1.0;
+        //     await Task.Delay(0);
+        //     return (float)ret;
+        // }
 
         public async Task<Tuple<float,Boek>> AIScore2(){
             // Deze 'berekening' is eigenlijk een ingewikkeld AI algoritme.
             // Pas de volgende vier regels niet aan.
-            double ret = 1.0f;
-            for (int i = 0; i < 10000000; i++)
-                for (int j = 0; j < 10; j++)
-                    ret = (ret + Willekeurig.Random.NextDouble()) % 1.0;
-            await Task.Delay(0);
-            return Tuple.Create((float)ret, this);
+            Task<Tuple<float,Boek>> calculate = Task.Run(() =>{
+                double ret = 1.0f;
+                for (int i = 0; i < 10000000; i++)
+                    for (int j = 0; j < 10; j++)
+                        ret = (ret + Willekeurig.Random.NextDouble()) % 1.0;
+                return Tuple.Create((float)ret, this);
+            });
+            Tuple<float,Boek> result = await calculate;
+            return result;
+            
         }
+
+        // public async Task<float> AIScore3(){
+        //     // Deze 'berekening' is eigenlijk een ingewikkeld AI algoritme.
+        //     // Pas de volgende vier regels niet aan.
+        //     double ret = 1.0f;
+        //     for (int i = 0; i < 10000000; i++)
+        //         for (int j = 0; j < 10; j++)
+        //             ret = (ret + Willekeurig.Random.NextDouble()) % 1.0;
+        //     await Task.Delay(0);
+        //     return (float)ret;
+        // }
 
     }
     static class Willekeurig
@@ -53,7 +68,7 @@ namespace AsyncBoekOpdracht
             await Willekeurig.Vertraging(); // INSERT INTO ...
             lijst.Add(b);
         }
-        public static async Task<List<Boek>> HaalLijstOp()
+        public static async Task<IEnumerable<Boek>> HaalLijstOp()
         {
             await Willekeurig.Vertraging(); // SELECT * FROM ...
             return lijst;
@@ -83,9 +98,10 @@ namespace AsyncBoekOpdracht
             var beschrijving = ConsoleWrapper.ReadLine();
             Boek? beste = null;
             float AIScoreCache = new float();
+
             var taskMaster = new List<Task<Tuple<float,Boek>>>();
 
-            foreach (var boek in await(Database.HaalLijstOp())){
+            foreach (var boek in (await Database.HaalLijstOp()).ToList()){
                 taskMaster.Add(boek.AIScore2());
             }
 
@@ -99,7 +115,7 @@ namespace AsyncBoekOpdracht
             if(beste != null){
                 Console.WriteLine("Het boek dat het beste overeenkomt met de beschrijving is: ");
                 Console.WriteLine(beste.Titel);
-                await Task.Delay(3000);
+                await Task.Delay(10000);
             }
             else{
                 Console.WriteLine("Sorry, geen boek gevonden (use better search terms You dingus)");
