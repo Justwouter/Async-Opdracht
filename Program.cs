@@ -40,17 +40,6 @@ namespace AsyncBoekOpdracht
             
         }
 
-        // public async Task<float> AIScore3(){
-        //     // Deze 'berekening' is eigenlijk een ingewikkeld AI algoritme.
-        //     // Pas de volgende vier regels niet aan.
-        //     double ret = 1.0f;
-        //     for (int i = 0; i < 10000000; i++)
-        //         for (int j = 0; j < 10; j++)
-        //             ret = (ret + Willekeurig.Random.NextDouble()) % 1.0;
-        //     await Task.Delay(0);
-        //     return (float)ret;
-        // }
-
     }
     static class Willekeurig
     {
@@ -135,7 +124,7 @@ namespace AsyncBoekOpdracht
         }
         static async Task Main(string[] args)
         {
-            seedDB(10);
+            seedDB(100);
             Console.WriteLine("Welkom bij de boeken administratie!");
             string key = "";
             while (key != "0") {
