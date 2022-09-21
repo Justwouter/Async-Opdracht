@@ -85,16 +85,16 @@ namespace AsyncBoekOpdracht
             Console.WriteLine("Welkom bij de boeken administratie!");
             string key = null;
             while (key != "q") {
-                Console.WriteLine("+) Boek toevoegen");
-                Console.WriteLine("z) Boek zoeken");
-                Console.WriteLine("b) Backup maken van de boeken");
-                Console.WriteLine("q) Quit");
+                Console.WriteLine("1) Boek toevoegen");
+                Console.WriteLine("2) Boek zoeken");
+                Console.WriteLine("3) Backup maken van de boeken");
+                Console.WriteLine("0) Quit");
                 key = Console.ReadLine();
-                if (key == "+")
+                if (key == "1")
                     VoegBoekToe();
-                else if (key == "z")
+                else if (key == "2")
                     ZoekBoek();
-                else if (key == "b")
+                else if (key == "3")
                     await Backup();
                 else Console.WriteLine("Ongeldige invoer!");
             }
