@@ -48,7 +48,7 @@ namespace AsyncBoekOpdracht
     }
     class Program
     {
-        static void VoegBoekToe() {
+        static async void VoegBoekToe() {
             Console.WriteLine("Geef de titel op: ");
             var titel = Console.ReadLine();
             Console.WriteLine("Geef de auteur op: ");
@@ -56,15 +56,15 @@ namespace AsyncBoekOpdracht
             Database.VoegToe(new Boek {Titel = titel, Auteur = auteur});
             Database.Logboek("Er is een nieuw boek!");
             Console.WriteLine("De huidige lijst met boeken is: ");
-            foreach (var boek in Database.HaalLijstOp()) {
+            foreach (var boek in await(Database.HaalLijstOp())) {
                 Console.WriteLine(boek.Titel);
             }
         }
-        static void ZoekBoek() {
+        static async void ZoekBoek() {
             Console.WriteLine("Waar gaat het boek over?");
             var beschrijving = Console.ReadLine();
             Boek beste = null;
-            foreach (var boek in Database.HaalLijstOp())
+            foreach (var boek in await(Database.HaalLijstOp()))
                 if (beste == null || boek.AIScore > beste.AIScore)
                     beste = boek;
             Console.WriteLine("Het boek dat het beste overeenkomt met de beschrijving is: ");
@@ -80,7 +80,7 @@ namespace AsyncBoekOpdracht
             await Willekeurig.Vertraging(2000, 3000);
             Backupping = false;
         }
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             Console.WriteLine("Welkom bij de boeken administratie!");
             string key = null;
