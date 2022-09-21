@@ -6,8 +6,14 @@ namespace AsyncBoekOpdracht
 {
     class Boek
     {
-        public string Titel { get; set; }
-        public string Auteur { get; set; }
+        public string Titel { get; set; } 
+        public string Auteur { get; set; } 
+
+        public Boek(string titel, string auteur){
+            this.Titel = titel;
+            this.Auteur = auteur;
+        }
+        
         public float AIScore {
             get {
                 // Deze 'berekening' is eigenlijk een ingewikkeld AI algoritme.
@@ -48,19 +54,19 @@ namespace AsyncBoekOpdracht
     }
     class Program
     {
-        static async void VoegBoekToe() {
+        static async Task VoegBoekToe() {
             Console.WriteLine("Geef de titel op: ");
             var titel = Console.ReadLine();
             Console.WriteLine("Geef de auteur op: ");
             var auteur = Console.ReadLine();
-            Database.VoegToe(new Boek {Titel = titel, Auteur = auteur});
+            Database.VoegToe(new Boek(titel,auteur));
             Database.Logboek("Er is een nieuw boek!");
             Console.WriteLine("De huidige lijst met boeken is: ");
             foreach (var boek in await(Database.HaalLijstOp())) {
                 Console.WriteLine(boek.Titel);
             }
         }
-        static async void ZoekBoek() {
+        static async Task ZoekBoek() {
             Console.WriteLine("Waar gaat het boek over?");
             var beschrijving = Console.ReadLine();
             Boek beste = null;
@@ -73,7 +79,7 @@ namespace AsyncBoekOpdracht
         static bool Backupping = false;
         // "Backup" kan lang duren. We willen dat de gebruiker niet hoeft te wachten,
         // en direct daarna boeken kan toevoegen en zoeken.
-        static async Task Backup() {
+        static async void Backup() {
             if (Backupping)
                 return;
             Backupping = true;
@@ -82,22 +88,36 @@ namespace AsyncBoekOpdracht
         }
         static async Task Main(string[] args)
         {
+            seedDB(10);
             Console.WriteLine("Welkom bij de boeken administratie!");
-            string key = null;
-            while (key != "q") {
+            string key = "";
+            while (key != "0") {
                 Console.WriteLine("1) Boek toevoegen");
                 Console.WriteLine("2) Boek zoeken");
                 Console.WriteLine("3) Backup maken van de boeken");
                 Console.WriteLine("0) Quit");
                 key = Console.ReadLine();
                 if (key == "1")
-                    VoegBoekToe();
+                    await VoegBoekToe();
                 else if (key == "2")
-                    ZoekBoek();
+                    await ZoekBoek();
                 else if (key == "3")
-                    await Backup();
+                    Backup();
                 else Console.WriteLine("Ongeldige invoer!");
+                Console.Clear();
+                
             }
         }
+
+
+        static void seedDB(int amount){
+            for(int i =0; i<amount;i++){
+                Database.VoegToe(new Boek(i.ToString(), i.ToString()));
+            }
+        }
+
+        // static void Main(String[] args){
+        //     MainAsync(args).GetAwaiter().GetResult();
+        // }
     }
 }
