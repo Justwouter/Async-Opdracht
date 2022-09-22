@@ -66,6 +66,10 @@ namespace AsyncBoekOpdracht
         {
             await Willekeurig.Vertraging(); // schrijf naar logbestand
         }
+
+         public static void VoegToeDEBUG(Boek b){
+            lijst.Add(b);
+        }
     }
     class Program
     {
@@ -94,13 +98,12 @@ namespace AsyncBoekOpdracht
                 taskMaster.Add(boek.AIScore2());
             }
 
-            int count = 0;
             foreach(var task in await(Task.WhenAll(taskMaster))){
                 if (task.Item1 > AIScoreCache)
                     AIScoreCache = task.Item1;
                     beste = task.Item2;
-                count++;
             }
+
             if(beste != null){
                 Console.WriteLine("Het boek dat het beste overeenkomt met de beschrijving is: ");
                 Console.WriteLine(beste.Titel);
@@ -122,23 +125,44 @@ namespace AsyncBoekOpdracht
             await Willekeurig.Vertraging(2000, 3000);
             Backupping = false;
         }
+
+        static async Task PrintDB(){
+            var taskMaster = new List<Task<Tuple<float,Boek>>>();
+
+            foreach (var boek in (await Database.HaalLijstOp()).ToList()){
+                taskMaster.Add(boek.AIScore2());
+            }
+            foreach(var task in await(Task.WhenAll(taskMaster))){
+                Console.WriteLine(task.Item2.Titel + " heeft score: "+task.Item1);
+            }
+
+
+        }
         static async Task Main(string[] args)
         {
-            seedDB(100);
+            
             Console.WriteLine("Welkom bij de boeken administratie!");
             string key = "";
             while (key != "0") {
                 Console.WriteLine("1) Boek toevoegen");
                 Console.WriteLine("2) Boek zoeken");
                 Console.WriteLine("3) Backup maken van de boeken");
+                Console.WriteLine("4) Print the DB");
                 Console.WriteLine("0) Quit");
+                await seedDB(100);
                 key = ConsoleWrapper.ReadLine();
-                if (key == "1")
+                if (key == "1"){
                     await VoegBoekToe();
-                else if (key == "2")
+                    continue;}
+                else if (key == "2"){
                     await ZoekBoek();
-                else if (key == "3")
+                    continue;}
+                else if (key == "3"){
                     Backup();
+                    continue;}
+                else if (key=="4"){
+                    await PrintDB();
+                    continue;}
                 else Console.WriteLine("Ongeldige invoer!");
                 Console.Clear();
                 
@@ -146,10 +170,12 @@ namespace AsyncBoekOpdracht
         }
 
 
-        static async void seedDB(int amount){
+        static async Task seedDB(int amount){
             for(int i =0; i<amount;i++){
-                await Database.VoegToe(new Boek(i.ToString(), i.ToString()));
+                Database.VoegToeDEBUG(new Boek(i.ToString(), i.ToString()));
             }
+            await Task.Delay(1);
+            Console.WriteLine("Database loaded!");
         }
 
         // static void Main(String[] args){
